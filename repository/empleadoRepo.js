@@ -2,7 +2,6 @@ const empleado = require('../clases/empleado');
 
 class empleadoControlador{
 
-    //Crear nuevo empleado
     async crearNuevo(req, res){
         try {
             const datos = await empleado.create(req.body)
