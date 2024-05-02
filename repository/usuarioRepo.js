@@ -1,20 +1,33 @@
 const usuario = require('../clases/usuario');
+const empleadoController = require('./empleadoRepo');
 
-class usuarioControlador{
+class usuarioControlador {
 
-    async crearNuevo(req, res){
-        try {
-            const datos = await usuario.create(req.body)
-            return res.json(datos);
-        } catch (error) {
-            res.status(500).send({
-                message:
-                    error.message || "Error de datos al registrar un nuevo usuario"
-            });
+    async crearNuevo(req, res) {
+
+        const idEmpleado = req.body.idEmpleado;
+        console.log("pasando la cedula " + idEmpleado);
+        const respuestaBusqueda = await empleadoController.encontrarEmpleadoPorCedula(idEmpleado)
+        console.log("la respuesta de la busqueda es :" + respuestaBusqueda);
+
+        if (respuestaBusqueda === 'existe') {
+            try {
+                const datos = await usuario.create(req.body)
+                return res.json(datos);
+            } catch (error) {
+                res.status(500).send({
+                    message:
+                        error.message || "Error de datos al registrar un nuevo usuario"
+                });
+            }
+        } else {
+            return res.send("No se puede agregar este usuario, prueba con otro empleado");
         }
+
+
     }
 
-    async listaUsuarios(req, res){
+    async listaUsuarios(req, res) {
 
         const nombre = req.query.nombreUsuario;
         var condicion = nombre ? { nombreUsuario: { $regex: new RegExp(nombre), $options: "i" } } : {};
@@ -30,10 +43,10 @@ class usuarioControlador{
         }
     }
 
-    async editarUsuario(req, res){
+    async editarUsuario(req, res) {
 
         //Si se envía cuerpo vacío o erróneo
-        if(!req.body){
+        if (!req.body) {
             {
                 return res.status(400).send({
                     message: "Por favor, enviar los datos para poder editar!"
@@ -44,14 +57,14 @@ class usuarioControlador{
         const id = req.params.id; //recoger idEmpleado
 
         try {
-            const datos = await usuario.findByIdAndUpdate(id, req.body, {useFindAndModify:false});
+            const datos = await usuario.findByIdAndUpdate(id, req.body, { useFindAndModify: false });
             //Si no se obtuvieron datos pr la modificación
-            if(!datos){
+            if (!datos) {
                 res.status(404).send({
                     message: "No fue posible actualizar el Usuario con id =${id}"
                 });
-            }else{
-                res.send({message: "Usuario actualizado correctamente!"});
+            } else {
+                res.send({ message: "Usuario actualizado correctamente!" });
             }
         } catch (error) {
             res.status(500).send({
@@ -60,16 +73,16 @@ class usuarioControlador{
         }
     }
 
-    async borrarUsuario(req, res){
+    async borrarUsuario(req, res) {
         const id = req.params.id;
 
         try {
             const datos = await usuario.findByIdAndDelete(id);
-            if(!datos){
+            if (!datos) {
                 res.status(404).send({
                     message: "No fue posible eliminar el usuario!"
                 });
-            }else{
+            } else {
                 res.send({
                     message: "Usuario eliminado correctamente!"
                 });

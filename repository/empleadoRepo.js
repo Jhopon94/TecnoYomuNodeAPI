@@ -59,6 +59,23 @@ class empleadoControlador{
             });
         }
     }
+
+    async encontrarEmpleadoPorCedula(id){
+        try {
+            const objetoEmpleado = await empleado.findOne({id: id}).exec();
+            console.log("el objeto encontrado es: " + objetoEmpleado);
+            if(objetoEmpleado === null){
+                console.log("noExisteEmpleado");
+                return "noExisteEmpleado";
+            }else{
+                console.log("existe");
+                return "existe";
+            }
+        } catch (error) {
+            console.log("errorConexion");
+            return "errorConexion";
+        }
+    }
 }
 module.exports = new empleadoControlador();
 
